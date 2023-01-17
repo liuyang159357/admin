@@ -36,11 +36,14 @@ module.exports = {
       warnings: false,
       errors: true
     },
-
     proxy: {
       // 配置代理跨域
-      '/dev-api': {
-        target: 'http://39.98.123.211',
+      '/dev-api/admin/acl': {
+        target: 'http://39.98.123.211:8170',
+        pathRewrite: { '^/dev-api': '' }
+      },
+      '/dev-api/admin/product': {
+        target: 'http://39.98.123.211:8510',
         pathRewrite: { '^/dev-api': '' }
       }
     }
