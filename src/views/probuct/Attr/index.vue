@@ -1,5 +1,11 @@
 <template>
-  <div>品牌管理</div>
+  <div class="attr">
+    <el-card style="margin:20px 0">
+      <CategorySelect></CategorySelect></el-card>
+ 
+    <el-card></el-card>
+
+  </div>
 </template>
 
 <script>

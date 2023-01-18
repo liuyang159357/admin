@@ -62,25 +62,25 @@ export const constantRoutes = [
     children: [
       {
         path: 'trademark',
-        component: () => import('@/views/probuct/tradeMark'),
+        component: () => import('@/views/probuct/TradeMark'),
         name: 'Trademark',
         meta: { title: '品牌管理' }
       },
       {
         path: 'attr',
-        conpoment: () => import('@/views/probuct/Attr'),
+        component: () => import('@/views/probuct/Attr'),
         name: 'Attr',
         meta: { title: '平台属性管理' }
       },
       {
         path: 'sku',
-        conpoment: () => import('@/views/probuct/Sku'),
+        component: () => import('@/views/probuct/Sku'),
         name: 'Sku',
         meta: { title: 'sku管理' }
       },
       {
         path: 'spu',
-        conpoment: () => import('@/views/probuct/Spu'),
+        component: () => import('@/views/probuct/Spu'),
         name: 'Spu',
         meta: { title: 'spu管理' }
       }

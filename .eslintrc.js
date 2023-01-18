@@ -16,7 +16,7 @@ module.exports = {
   rules: {
     "vue/html-self-closing": ["error", {
       "html": {
-        "void": "never",
+        "void": "always",
         "normal": "any",
         "component": "any"
       },
