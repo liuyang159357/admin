@@ -204,8 +204,8 @@ module.exports = {
     }],
     'array-bracket-spacing': [0, 'never'],
     // 关闭未使用报错
-    // "vue/no-unused-components": "off",
-    // "no-unused-vars": "off",
+    "vue/no-unused-components": "off",
+    "no-unused-vars": "off",
 
   }
 }
