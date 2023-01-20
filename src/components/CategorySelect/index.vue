@@ -69,7 +69,6 @@ export default {
   methods: {
     //获取一级分类列表
     async getCategoryList1() {
-      console.log(this.$API);
       let result = await this.$API.attr.reqCategoryList1();
       if (result.code === 200) {
         this.list1 = result.data;
