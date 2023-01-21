@@ -4,42 +4,45 @@
       <el-form-item label="一级分类">
         <el-select
           v-model="idFrom.category1"
+          :disabled="!show"
           placeholder="请选择"
           @change="handler1"
         >
           <el-option
+            v-for="item in list1"
+            :key="item.id"
             :label="item.name"
             :value="item.id"
-            v-for="item in this.list1"
-            :key="item.id"
           ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="一级分类">
         <el-select
           v-model="idFrom.category2"
+          :disabled="!show"
           placeholder="请选择"
           @change="handler2"
         >
           <el-option
+            v-for="item in list2"
+            :key="item.id"
             :label="item.name"
             :value="item.id"
-            v-for="item in this.list2"
-            :key="item.id"
           ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="一级分类">
         <el-select
           v-model="idFrom.category3"
+          :disabled="!show"
           placeholder="请选择"
           @change="handler3"
         >
           <el-option
+            v-for="item in list3"
+            :key="item.id"
             :label="item.name"
             :value="item.id"
-            v-for="item in this.list3"
-            :key="item.id"
           ></el-option>
         </el-select>
       </el-form-item>
@@ -50,6 +53,7 @@
 <script>
 export default {
   name: "CategorySelect",
+  props: ["show"],
   data() {
     return {
       list1: "",
