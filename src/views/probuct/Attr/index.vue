@@ -11,7 +11,7 @@
         <el-button
           type="primary"
           icon="el-icon-plus"
-          style="margin-bottom: 10px"
+          style="margin-bottom: 20px"
           :disabled="!idFrom.category3"
           @click="addAttr"
           >添加属性</el-button
@@ -48,6 +48,7 @@
                 type="danger"
                 icon="el-icon-delete"
                 size="mini"
+                @click="deleteAttr(row)"
               ></el-button>
             </template>
           </el-table-column>
@@ -118,7 +119,12 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-button :disabled="attrInfo.attrValueList.length<1" type="primary" @click="addOrUpdateAttr">保存</el-button>
+        <el-button
+          :disabled="attrInfo.attrValueList.length < 1"
+          type="primary"
+          @click="addOrUpdateAttr"
+          >保存</el-button
+        >
         <el-button @click="isShowTable = true">取消</el-button>
       </div>
     </el-card>
@@ -182,6 +188,31 @@ export default {
       //在修改某个属性的时候，给该属性的所有属性值添加flag标记
       this.attrInfo.attrValueList.forEach((i) => this.$set(i, "flag", false));
     },
+    //删除属性
+    deleteAttr(row) {
+      console.log(row);
+      this.$confirm(`确定删除${row.attrName}属性吗？`, {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(async () => {
+          let result = await this.$API.attr.reqDeleteAttr(row.id);
+          if (result.code === 200) {
+            this.$message({
+              type: "success",
+              message: "删除成功!",
+            });
+            this.getAttrList()
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
     //添加属性值
     addAttrValue() {
       //往attrValueList中添加元素
@@ -233,7 +264,6 @@ export default {
           }
         }
       );
-      console.log("🚀 ~ file: index.vue:236 ~ addOrUpdateAttr ~ this.attrInfo.attrValueList", this.attrInfo.attrValueList)
       let result = await this.$API.attr.reqAddOrUpdateAttr(this.attrInfo);
       console.log(result);
       if (result.code === 200) {

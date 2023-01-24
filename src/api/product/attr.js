@@ -21,9 +21,14 @@ export const reqAttrList = ({ category1, category2, category3 }) => request({
     url: `/admin/product/attrInfoList/${category1}/${category2}/${category3}`,
     method: 'get'
 })
-//添加属性与属性值
+//添加或修改属性与属性值
 export const reqAddOrUpdateAttr = (data) => request({
     url: `/admin/product/saveAttrInfo`,
     method: 'post',
     data:data
+})
+//删除属性
+export const reqDeleteAttr=(attrId)=>request({
+    url:`/admin/product/deleteAttr/${attrId}`,
+    method:'delete'
 })

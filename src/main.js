@@ -4,7 +4,7 @@ import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import locale from 'element-ui/lib/locale/lang/en' // lang i18n
+import locale from 'element-ui/lib/locale/lang/zh-CN' // lang i18n
 
 import '@/styles/index.scss' // global css
 
@@ -41,7 +41,9 @@ Vue.prototype.$API = API
 //注册三级联动组件
 import CategorySelect from '@/components/CategorySelect'
 Vue.component(CategorySelect.name, CategorySelect)
-
+//注册
+import HintButton from '@/components/HintButton'
+Vue.component('HintButton',HintButton)
 new Vue({
   el: '#app',
   router,
