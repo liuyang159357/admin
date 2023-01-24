@@ -25,3 +25,19 @@ export const reqAddSpu=(data)=>request({
     method:'post',
     data:data
 })
+//修改或者添加spu
+export const reqUpdateOrAddSpu=(spuInfo)=>{
+    if(spuInfo.id){
+        return request({
+            url:'/admin/product/updateSpuInfo',
+            method:'post',
+            data:spuInfo
+        })
+    }else{
+        return request({
+            url:'/admin/product/SaveSpuInfo',
+            method:'post',
+            data:spuInfo
+        })
+    }
+}

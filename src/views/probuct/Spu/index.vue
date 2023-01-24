@@ -25,7 +25,7 @@
           ></el-table-column>
           <el-table-column prop="spuName" label="SPU名称"></el-table-column>
           <el-table-column prop="description" label="SPU描述"></el-table-column>
-          <el-table-column label="SPU操作">
+          <el-table-column label="SPU操作" align="center">
             <template slot-scope="{ row }">
               <HintButton
                 title="添加SKU"
@@ -136,10 +136,16 @@ export default {
     },
     changeSene(scene) {
       this.scene = scene;
+      this.getSpuList()
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.el-table ::v-deep {
+  tr th .cell {
+    text-align: center;
+  }
+}
 </style>
