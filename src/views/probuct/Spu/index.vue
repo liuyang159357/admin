@@ -9,7 +9,7 @@
     <el-card>
       <div v-show="scene === 0">
         <el-button
-          :disabled="!id"
+          :disabled="!idForm"
           type="primary"
           icon="el-icon-plus"
           style="margin-bottom: 20px"
@@ -32,6 +32,7 @@
                 type="success"
                 icon="el-icon-plus"
                 size="mini"
+                @click="addSku(row)"
               ></HintButton>
               <HintButton
                 title="修改SPU"
@@ -46,12 +47,15 @@
                 icon="el-icon-info"
                 size="mini"
               ></HintButton>
-              <HintButton
-                title="删除SPU"
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-              ></HintButton>
+              <el-popconfirm title="确定删除吗？" @onConfirm="deleteSpu(row)">
+                <HintButton
+                  slot="reference"
+                  title="删除SPU"
+                  type="danger"
+                  icon="el-icon-delete"
+                  size="mini"
+                ></HintButton>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -70,7 +74,7 @@
         <SpuForm ref="spu" @changeSene="changeSene"></SpuForm>
       </div>
       <div v-show="scene === 2">
-        <SkuForm></SkuForm>
+        <SkuForm ref="sku" @changeSene="changeSene"></SkuForm>
       </div>
     </el-card>
   </div>
@@ -92,22 +96,23 @@ export default {
       total: 0,
       list: [],
       //三级联动传来的三级id
-      id: "",
+      idForm: "",
       scene: 0, //控值三级联动下边显示内容的切换
     };
   },
   methods: {
     //三级联动的自定义事件
-    getCategoryId(idFrom) {
-      this.id = idFrom.category3;
+    getCategoryId(idForm) {    
+      this.idForm = idForm;
       this.getSpuList();
+
     },
     //获取SPU列表数据
-    async getSpuList() {
+    async getSpuList() {  
       let result = await this.$API.spu.reqSpuInfoList(
         this.page,
         this.limit,
-        this.id
+        this.idForm.category3Id
       );
       if (result.code === 200) {
         this.list = result.data.records;
@@ -127,16 +132,33 @@ export default {
     //添加Spu按钮回调
     addSpu() {
       this.scene = 1;
-      this.$refs.spu.initSpuData();
+      this.$refs.spu.addSpuData(this.idForm.category3Id);
+    },
+    //添加sku回调
+    addSku(row) {
+      this.scene = 2;
+      this.$refs.sku.getData(row,this.idForm)
     },
     //修改Spu回调
     updateSpu(row) {
       this.scene = 1;
       this.$refs.spu.initSpuData(row);
     },
+    //删除SPU回调
+    async deleteSpu(row) {
+      let result = await this.$API.spu.reqDeleteSpu(row.id);
+      if (result.code === 200) {
+        if (this.list.length <= 1) {
+          this.page -= 1;
+        }
+        this.getSpuList();
+        this.$message.success("删除成功");
+      }
+    },
+    //子组件条件或修改成功后回调
     changeSene(scene) {
       this.scene = scene;
-      this.getSpuList()
+      this.getSpuList();
     },
   },
 };

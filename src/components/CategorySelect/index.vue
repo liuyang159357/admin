@@ -1,9 +1,9 @@
 <template>
   <div class="categorySelect">
-    <el-form v-model="idFrom" :inline="true" class="demo-form-inline">
+    <el-form v-model="idForm" :inline="true" class="demo-form-inline">
       <el-form-item label="一级分类">
         <el-select
-          v-model="idFrom.category1"
+          v-model="idForm.category1Id"
           :disabled="!show"
           placeholder="请选择"
           @change="handler1"
@@ -18,7 +18,7 @@
       </el-form-item>
       <el-form-item label="一级分类">
         <el-select
-          v-model="idFrom.category2"
+          v-model="idForm.category2Id"
           :disabled="!show"
           placeholder="请选择"
           @change="handler2"
@@ -33,7 +33,7 @@
       </el-form-item>
       <el-form-item label="一级分类">
         <el-select
-          v-model="idFrom.category3"
+          v-model="idForm.category3Id"
           :disabled="!show"
           placeholder="请选择"
           @change="handler3"
@@ -60,10 +60,10 @@ export default {
       list2: "",
       list3: "",
       //收集分类id
-      idFrom: {
-        category1: "",
-        category2: "",
-        category3: "",
+      idForm: {
+        category1Id: "",
+        category2Id: "",
+        category3Id: "",
       },
     };
   },
@@ -81,12 +81,12 @@ export default {
     //切换一级分类
     async handler1(id) {
       //清除二级，三级数据
-      this.idFrom.category2 = "";
+      this.idForm.category2Id = "";
       this.list2 = [];
-      this.idFrom.category3 = "";
+      this.idForm.category3Id = "";
       this.list3 = [];
       //父组件回调
-      // this.$emit("getCategoryId", this.idFrom);
+      // this.$emit("getCategoryId", this.idForm);
       let result = await this.$API.attr.reqCategoryList2(id);
       if (result.code === 200) {
         this.list2 = result.data;
@@ -95,10 +95,10 @@ export default {
     //切换二级分类
     async handler2(id) {
       //清除三级数据
-      this.idFrom.category3 = "";
+      this.idForm.category3Id = "";
       this.list3 = [];
       //父组件回调
-      // this.$emit("getCategoryId", this.idFrom);
+      // this.$emit("getCategoryId", this.idForm);
       let result = await this.$API.attr.reqCategoryList3(id);
       if (result.code === 200) {
         this.list3 = result.data;
@@ -107,7 +107,8 @@ export default {
     //切换三级分类
     handler3(id) {
       //父组件回调
-      this.$emit("getCategoryId", this.idFrom);
+      console.log(this.idForm);
+      this.$emit("getCategoryId", this.idForm);
     },
   },
 };

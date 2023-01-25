@@ -35,9 +35,14 @@ export const reqUpdateOrAddSpu=(spuInfo)=>{
         })
     }else{
         return request({
-            url:'/admin/product/SaveSpuInfo',
+            url:'/admin/product/saveSpuInfo',
             method:'post',
             data:spuInfo
         })
     }
 }
+//删除Spu
+export const reqDeleteSpu=(spuId)=>request({
+    url:`/admin/product/deleteSpu/${spuId}`,
+    method:'delete'
+})

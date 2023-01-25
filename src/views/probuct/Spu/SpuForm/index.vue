@@ -118,7 +118,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="addOrUpdateSpu">保存</el-button>
-        <el-button @click="$emit('changeSene', 0)">取消</el-button>
+        <el-button @click="cancel">取消</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -162,7 +162,7 @@ export default {
           //   ],
           // },
         ],
-        tmId: 0,
+        tmId: "",
       },
       tradeMarkList: [], //存储品牌数据
       spuImageList: [], //spu图片数据
@@ -174,11 +174,14 @@ export default {
   computed: {
     unSelectSaleAttr() {
       //计算出未选择的销售属性
-      let result = this.saleAttr.filter((i) => {
-        return this.spu.spuSaleAttrList.every((item) => {
-          return i.name !== item.saleAttrName;
+      let result = this.saleAttr;
+      if (this.spu.spuSaleAttrList) {
+        result = this.saleAttr.filter((i) => {
+          return this.spu.spuSaleAttrList.every((item) => {
+            return i.name !== item.saleAttrName;
+          });
         });
-      });
+      }
       return result;
     },
   },
@@ -194,31 +197,42 @@ export default {
     handlerSuccess(response, file, fileList) {
       this.spuImageList = fileList;
     },
-    //初始化Spuform数据
+    //点击父组件添加Spu按钮回调
+    async addSpuData(id) {
+      this.spu.category3Id = id;
+      //获取品牌的信息
+      let tradeMarkInfo = await this.$API.spu.reqTrademarkList();
+      if (tradeMarkInfo.code === 200) {
+        this.tradeMarkList = tradeMarkInfo.data;
+      }
+      //获取平台全部的销售属性
+      let saleAttr = await this.$API.spu.reqSaleAttrList();
+      if (saleAttr.code === 200) {
+        this.saleAttr = saleAttr.data;
+      }
+    },
+    //点击父组件修改初始化Spuform数据
     async initSpuData(spu) {
       //spu是父组件传递的数据
-      if (spu.id) {
-        //获取SPU数据
-        let result = await this.$API.spu.reqSpu(spu.id);
-        if (result.code === 200) {
-          this.spu = result.data;
-        }
-        //获取spu图片的数据
-        let spuImage = await this.$API.spu.reqSpuImageList(spu.id);
-        if (spuImage.code === 200) {
-          spuImage.data.forEach((i) => {
-            i.name = i.imgName;
-            i.url = i.imgUrl;
-          });
-          this.spuImageList = spuImage.data;
-        }
-        //获取品牌的信息
-        let tradeMarkInfo = await this.$API.spu.reqTrademarkList();
-        if (tradeMarkInfo.code === 200) {
-          this.tradeMarkList = tradeMarkInfo.data;
-        }
+      //获取SPU数据
+      let result = await this.$API.spu.reqSpu(spu.id);
+      if (result.code === 200) {
+        this.spu = result.data;
       }
-
+      //获取spu图片的数据
+      let spuImage = await this.$API.spu.reqSpuImageList(spu.id);
+      if (spuImage.code === 200) {
+        spuImage.data.forEach((i) => {
+          i.name = i.imgName;
+          i.url = i.imgUrl;
+        });
+        this.spuImageList = spuImage.data;
+      }
+      //获取品牌的信息
+      let tradeMarkInfo = await this.$API.spu.reqTrademarkList();
+      if (tradeMarkInfo.code === 200) {
+        this.tradeMarkList = tradeMarkInfo.data;
+      }
       //获取平台全部的销售属性
       let saleAttr = await this.$API.spu.reqSaleAttrList();
       if (saleAttr.code === 200) {
@@ -268,17 +282,24 @@ export default {
       });
     },
     //保存按钮回调
-   async addOrUpdateSpu() {
-     this.spu.spuImageList= this.spuImageList.map((item) => {
+    async addOrUpdateSpu() {
+      this.spu.spuImageList = this.spuImageList.map((item) => {
         return {
           imageName: item.name,
           imageUrl: (item.response && item.response.data) || item.url,
         };
       });
-      let result=await this.$API.spu.reqUpdateOrAddSpu(this.spu)
-      if(result.code===200){
-     this.$emit('changeSene',0)
+      let result = await this.$API.spu.reqUpdateOrAddSpu(this.spu);
+      if (result.code === 200) {
+        this.$message.success(this.spu.id?'修改成功':'添加成功')
+        this.$emit("changeSene", 0);
+        Object.assign(this._data, this.$options.data());
       }
+    },
+    //点击起取消
+    cancel() {
+      this.$emit("changeSene", 0);
+      Object.assign(this._data, this.$options.data());
     },
   },
 };
