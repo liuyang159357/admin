@@ -107,7 +107,6 @@ export default {
     //切换三级分类
     handler3(id) {
       //父组件回调
-      console.log(this.idForm);
       this.$emit("getCategoryId", this.idForm);
     },
   },

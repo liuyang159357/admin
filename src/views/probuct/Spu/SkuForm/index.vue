@@ -18,6 +18,7 @@
       <el-form-item label="重量(千克)">
         <el-input
           v-model.number="skuInfo.weight"
+          type="number"
           placeholder="请输入重量(千克)"
         ></el-input>
       </el-form-item>
@@ -49,11 +50,6 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="无线通信">
-            <el-select value="" placeholder="请选择">
-              <el-option value=""> </el-option>
-            </el-select>
-          </el-form-item>
         </el-form>
       </el-form-item>
       <el-form-item v-if="spuSaleAttrList.length" label="销售属性">
@@ -79,15 +75,36 @@
         </el-form>
       </el-form-item>
       <el-form-item label="图片列表">
-        <el-table style="width: 100%" border>
-          <el-table-column type="selection" width="80"> </el-table-column>
-          <el-table-column label="图片"> </el-table-column>
-          <el-table-column label="名称"> </el-table-column>
-          <el-table-column label="操作"> </el-table-column>
+        <el-table
+          :data="spuImageList"
+          style="width: 100%"
+          border
+          @selection-change="handlerSelectionChange"
+        >
+          <el-table-column type="selection" width="80" align="center">
+          </el-table-column>
+          <el-table-column label="图片" align="center">
+            <template slot-scope="{ row }">
+              <img :src="row.imgUrl" style="width: 100px; height: 100px" />
+            </template>
+          </el-table-column>
+          <el-table-column label="名称" prop="imgName" align="center">
+          </el-table-column>
+          <el-table-column label="操作" align="center">
+            <template slot-scope="{ row }">
+              <el-button
+                v-if="!row.isDefault"
+                type="primary"
+                @click="changeDefault(row)"
+                >设置默认</el-button
+              >
+              <el-button v-else>默认</el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">保存</el-button>
+        <el-button type="primary" @click="save">保存</el-button>
         <el-button @click="cancel">取消</el-button>
       </el-form-item>
     </el-form>
@@ -109,7 +126,7 @@ export default {
         tmId: 0,
         price: "",
         skuName: "",
-        weight: "",
+        weight: "",//必填
         skuDesc: "",
         skuAttrValueList: [],
         skuImageList: [],
@@ -120,6 +137,7 @@ export default {
   },
   methods: {
     async getData(row, idForm) {
+      //初始化skuForm数据
       console.log(row, idForm);
       this.spuName = row.spuName;
       this.skuInfo.spuId = row.id;
@@ -132,15 +150,59 @@ export default {
       }
       //销售属性数据
       let sale = await this.$API.sku.reqspuSaleAttrList(row.id);
-      console.log("🚀 ~ file: index.vue:76 ~ getData ~ sale", sale);
       if (sale.code === 200) {
         this.spuSaleAttrList = sale.data;
       }
       //图片数据
       let imageList = await this.$API.sku.reqSpuImageList(row.id);
-      console.log("🚀 ~ file: index.vue:81 ~ getData ~ imageList", imageList);
       if (imageList.code === 200) {
+        imageList.data.forEach((item) => {
+          item.isDefault = 0;
+        });
         this.spuImageList = imageList.data;
+      }
+    },
+    //图片列表多选框回调
+    handlerSelectionChange(selection) {
+      this.skuInfo.skuImageList = selection;
+    },
+    //切换图片的默认项
+    changeDefault(row) {
+      this.spuImageList.forEach((item) => (item.isDefault = 0));
+      row.isDefault = 1;
+      this.skuInfo.skuDefaultImg = row.imgUrl;
+    },
+    //保存按钮回调
+    async save() {
+      if(!this.skuInfo.weight){
+        this.$message.warning('重量是必填的')
+        return
+      }
+      //整理平台属性数据
+      let array = [];
+      this.skuInfo.skuAttrValueList.forEach((item) => {
+        if (item) {
+          const [attrId, valueId] = item.split(":");
+          let obj = { valueId, attrId };
+          array.push(obj);
+        }
+        this.skuInfo.skuAttrValueList = array;
+      });
+      //整理销售属性数据
+      let array2 = this.skuInfo.skuSaleAttrValueList.reduce((prev, item) => {
+        if (item) {
+          const [saleAttrId, saleAttrvalueId] = item.split(":");
+          prev.push({ saleAttrvalueId, saleAttrId });
+        }
+        return prev;
+      }, []);
+      this.skuInfo.skuSaleAttrValueList = array2;
+      //保存数据
+      let result = await this.$API.sku.reqAddSku(this.skuInfo);
+      if (result.code === 200) {
+        Object.assign(this._data, this.$options.data());
+        this.$emit("changeSene", 0);
+        this.$message.success("添加成功");
       }
     },
     //取消按钮回调

@@ -26,7 +26,7 @@
           <el-table-column prop="spuName" label="SPU名称"></el-table-column>
           <el-table-column prop="description" label="SPU描述"></el-table-column>
           <el-table-column label="SPU操作" align="center">
-            <template slot-scope="{ row }">
+            <template slot-scope="{ row, $index }">
               <HintButton
                 title="添加SKU"
                 type="success"
@@ -39,13 +39,14 @@
                 type="warning"
                 icon="el-icon-edit"
                 size="mini"
-                @click="updateSpu(row)"
+                @click="updateSpu(row, $index)"
               ></HintButton>
               <HintButton
                 title="查看当前SPU全部SKU列表"
                 type="info"
                 icon="el-icon-info"
                 size="mini"
+                @click="viewSkuList(row)"
               ></HintButton>
               <el-popconfirm title="确定删除吗？" @onConfirm="deleteSpu(row)">
                 <HintButton
@@ -77,6 +78,34 @@
         <SkuForm ref="sku" @changeSene="changeSene"></SkuForm>
       </div>
     </el-card>
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="dialogTableVisible"
+      width="80%"
+      @close="handleClose"
+    >
+      <el-table v-loading="loading" :data="gridData" border>
+        <el-table-column prop="skuName" label="名称"></el-table-column>
+        <el-table-column
+          prop="price"
+          label="价格(元)"
+          align="center"
+        ></el-table-column>
+        <el-table-column
+          prop="weight"
+          label="重量(千克)"
+          align="center"
+        ></el-table-column>
+        <el-table-column prop="skuDefaultImg" label="默认图片" align="center">
+          <template slot-scope="{ row }">
+            <img
+              :src="row.skuDefaultImg"
+              alt=""
+              style="width: 100px; height: 100px"
+            /> </template
+        ></el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -98,17 +127,20 @@ export default {
       //三级联动传来的三级id
       idForm: "",
       scene: 0, //控值三级联动下边显示内容的切换
+      gridData: [], //对话框内容
+      dialogTitle: "", //对话标题
+      dialogTableVisible: false, //控制对话框显示
+      loading: true, //加载效果
     };
   },
   methods: {
     //三级联动的自定义事件
-    getCategoryId(idForm) {    
+    getCategoryId(idForm) {
       this.idForm = idForm;
       this.getSpuList();
-
     },
     //获取SPU列表数据
-    async getSpuList() {  
+    async getSpuList() {
       let result = await this.$API.spu.reqSpuInfoList(
         this.page,
         this.limit,
@@ -137,12 +169,27 @@ export default {
     //添加sku回调
     addSku(row) {
       this.scene = 2;
-      this.$refs.sku.getData(row,this.idForm)
+      this.$refs.sku.getData(row, this.idForm);
     },
     //修改Spu回调
     updateSpu(row) {
       this.scene = 1;
       this.$refs.spu.initSpuData(row);
+    },
+    //点击查看Sku回调
+    async viewSkuList(row) {
+      this.dialogTableVisible = true;
+      this.dialogTitle = row.spuName;
+      let result = await this.$API.sku.reqcurrentSkuList(row.id);
+      if (result.code === 200) {
+        this.gridData = result.data;
+        this.loading = false;
+      }
+    },
+    //关闭查看SKU列表的回调
+    handleClose() {
+      this.loading = true;
+      this.gridData = [];
     },
     //删除SPU回调
     async deleteSpu(row) {
