@@ -19,7 +19,7 @@
           <img
             :src="row.skuDefaultImg"
             alt="123"
-            style="width: 100px; height: 100px"
+            :class="row.skuDefaultImg ? 'show' : ''"
           />
         </template>
       </el-table-column>
@@ -121,10 +121,13 @@
         </el-col>
       </el-row>
       <el-row>
-        <el-col v-if="skuInfo.skuImageList" :span="5">
+        <el-col :span="5">
           <div class="title">商品图片</div>
         </el-col>
-        <el-col :span="12">
+        <el-col
+          v-if="skuInfo.skuImageList && skuInfo.skuImageList.length"
+          :span="12"
+        >
           <el-carousel :interval="2000" weight="150px" height="150px">
             <el-carousel-item
               v-for="item in skuInfo.skuImageList"
@@ -134,6 +137,7 @@
             </el-carousel-item>
           </el-carousel>
         </el-col>
+        <el-col v-else :span="12"> 暂无 </el-col>
       </el-row>
     </el-drawer>
   </div>
@@ -212,7 +216,11 @@ export default {
     text-align: center;
   }
   button {
-    margin: 10px;
+    margin: 5px;
+  }
+  .show {
+    width: 100px;
+    height: 100px;
   }
 }
 .el-col {
@@ -232,5 +240,7 @@ export default {
 .el-carousel__item {
   text-align: center;
 }
-
+.el-carousel__button ::v-deep {
+  width: 5px !important;
+}
 </style>
