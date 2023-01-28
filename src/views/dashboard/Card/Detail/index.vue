@@ -52,7 +52,7 @@ export default {
   display: flex;
   align-items: center;
   font-size: 12px;
-  height: 40px;
+  height: 50px;
   margin-bottom: 5px;
 }
 .card-footer {

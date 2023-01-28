@@ -23,7 +23,7 @@ import '@/permission' // permission control
  * Currently MockJs will be used in the production environment,
  * please remove it before going online ! ! !
  */
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'development') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
@@ -32,6 +32,23 @@ if (process.env.NODE_ENV === 'production') {
 Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
+
+// 挂载moment
+import moment from "moment"
+Vue.prototype.$moment = moment;
+moment.locale('zh-cn')
+//过滤器
+Vue.filter('dateFormat', (str, partten = "YYYY-MM-DD HH:mm:ss") => {
+  return moment(str).format(partten);
+})
+
+// 挂载resize方法
+Vue.prototype.$echartsResize = (mycharts)=>{
+  window.addEventListener("resize",function(){
+    mycharts.resize()
+  })
+}
+
 
 Vue.config.productionTip = false
 
